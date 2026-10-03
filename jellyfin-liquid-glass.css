@@ -1,0 +1,442 @@
+/* ==========================================================================
+   JELLYFIN — LIQUID GLASS
+   Install:  Dashboard → General → Custom CSS code → paste → Save → hard refresh
+   Works best with: Settings → Display → Theme = Dark  (Jellyfin 10.9+)
+
+   OPTIONAL thinner, rounder icons (clients need internet access).
+   To use: remove the comment markers and keep it as the FIRST line of the CSS.
+   Experimental — if any icon shows as text or blank, delete it again.
+
+   @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..400,0..1,-25..0&display=swap");
+   .material-icons { font-family: "Material Symbols Rounded" !important; font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24; }
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   1. TOKENS — change these to restyle everything
+   -------------------------------------------------------------------------- */
+:root {
+  --lg-accent: #79b8ff;
+  --lg-accent-2: #b89bff;
+  --lg-glow: rgba(121, 184, 255, .42);
+
+  --lg-radius: 18px;
+  --lg-radius-sm: 12px;
+  --lg-blur: 22px;
+
+  --lg-ease: cubic-bezier(.22, 1, .36, 1);
+  --lg-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  --lg-text: rgba(255, 255, 255, .94);
+  --lg-text-dim: rgba(255, 255, 255, .64);
+  --lg-rim: rgba(255, 255, 255, .2);
+
+  /* Glass = specular sheen (top-left) + soft white veil + dark tint for legibility */
+  --lg-fill:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, .2), transparent 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, .11), rgba(255, 255, 255, .03)),
+    linear-gradient(rgba(12, 16, 28, .42), rgba(12, 16, 28, .42));
+  --lg-fill-strong:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, .22), transparent 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)),
+    linear-gradient(rgba(12, 16, 28, .68), rgba(12, 16, 28, .68));
+
+  --lg-filter: blur(var(--lg-blur)) saturate(185%) brightness(1.08);
+  --lg-shadow:
+    0 12px 36px rgba(0, 0, 0, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .38),
+    inset 0 -1px 0 rgba(255, 255, 255, .06),
+    inset 0 0 26px rgba(255, 255, 255, .04);
+}
+
+/* Browsers without backdrop-filter, or users who asked for less transparency → solid surfaces */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --lg-fill: rgba(24, 28, 42, .96); --lg-fill-strong: rgba(30, 35, 52, .98); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root { --lg-fill: rgba(24, 28, 42, .96); --lg-fill-strong: rgba(30, 35, 52, .98); --lg-filter: none; }
+}
+@media (max-width: 40em) { :root { --lg-blur: 16px; } }
+
+
+/* --------------------------------------------------------------------------
+   2. BASE — background, type, scrollbars
+   -------------------------------------------------------------------------- */
+html { background: #070a12; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+html, body, button, input, select, textarea {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter,
+               "Segoe UI Variable", "Segoe UI", Roboto, "Noto Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Soft aurora behind everything so the glass has something to refract */
+.backgroundContainer:not(.withBackdrop) {
+  background:
+    radial-gradient(60vmax 60vmax at 8% -5%,  rgba(121, 184, 255, .30), transparent 60%),
+    radial-gradient(55vmax 55vmax at 98% 12%, rgba(184, 155, 255, .26), transparent 60%),
+    radial-gradient(65vmax 65vmax at 55% 115%, rgba(255, 128, 170, .16), transparent 60%),
+    #070a12 !important;
+}
+/* When a poster/backdrop is showing, let it glow through */
+.backgroundContainer.withBackdrop {
+  background: linear-gradient(180deg, rgba(7, 10, 18, .5), rgba(7, 10, 18, .9)) !important;
+}
+
+::selection { background: var(--lg-glow); color: #fff; }
+
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .28) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .24); border-radius: 99px;
+  border: 3px solid transparent; background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .4); background-clip: content-box; }
+
+
+/* --------------------------------------------------------------------------
+   3. GLASS SURFACES — header, drawer, dialogs, menus, toasts, player bar
+   -------------------------------------------------------------------------- */
+.skinHeader,
+.skinHeader.semiTransparent,
+.skinHeader-withBackground,
+.MuiAppBar-root {
+  background: var(--lg-fill) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .14), 0 10px 30px rgba(0, 0, 0, .28);
+  color: var(--lg-text);
+}
+
+.mainDrawer,
+.MuiDrawer-paper {
+  background: var(--lg-fill-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow);
+  border-radius: 0 var(--lg-radius) var(--lg-radius) 0;
+  border-right: 1px solid var(--lg-rim);
+}
+
+.MuiPaper-root:not(.MuiDrawer-paper):not(.MuiAppBar-root) {
+  background: var(--lg-fill-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow);
+  border: 1px solid var(--lg-rim);
+  border-radius: var(--lg-radius);
+}
+
+.dialogBackdrop { background: rgba(5, 8, 14, .5) !important; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+.dialog:not([class*="fullscreen"]),
+.actionSheetContent {
+  background: var(--lg-fill-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow);
+  border: 1px solid var(--lg-rim);
+  border-radius: 24px;
+  color: var(--lg-text);
+}
+.actionSheetMenuItem { border-radius: 10px; transition: background-color .25s var(--lg-ease); }
+
+.toast {
+  background: var(--lg-fill-strong) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border: 1px solid var(--lg-rim);
+  border-radius: 999px;
+  box-shadow: var(--lg-shadow);
+  color: var(--lg-text);
+}
+
+.videoOsdBottom {
+  background: var(--lg-fill) !important;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  border-radius: var(--lg-radius) var(--lg-radius) 0 0;
+  box-shadow: var(--lg-shadow);
+  padding-bottom: max(.6rem, env(safe-area-inset-bottom));
+}
+.sliderBubble {
+  background: var(--lg-fill-strong) !important;
+  border: 1px solid var(--lg-rim);
+  border-radius: 10px;
+}
+
+/* Form fields */
+.emby-input, .emby-textarea, .emby-select, .emby-select-withcolor {
+  background: rgba(255, 255, 255, .07) !important;
+  border: 1px solid rgba(255, 255, 255, .15) !important;
+  border-radius: var(--lg-radius-sm) !important;
+  color: var(--lg-text);
+  transition: border-color .3s var(--lg-ease), box-shadow .3s var(--lg-ease), background-color .3s var(--lg-ease);
+}
+.emby-input:focus, .emby-textarea:focus, .emby-select:focus, .emby-select-withcolor:focus {
+  border-color: var(--lg-accent) !important;
+  box-shadow: 0 0 0 4px var(--lg-glow);
+  background: rgba(255, 255, 255, .11) !important;
+}
+.emby-select-withcolor > option, .emby-select > option { background: #141824; color: #fff; }
+
+
+/* --------------------------------------------------------------------------
+   4. ICONS — round glass hit-areas, glow on the active one
+   -------------------------------------------------------------------------- */
+.material-icons { -webkit-font-smoothing: antialiased; transition: color .3s var(--lg-ease), filter .3s var(--lg-ease); }
+
+.paper-icon-button-light,
+.headerButton {
+  border-radius: 50%;
+  transition: background-color .3s var(--lg-ease), scale .35s var(--lg-spring), box-shadow .3s var(--lg-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .paper-icon-button-light:hover,
+  .headerButton:hover {
+    background: rgba(255, 255, 255, .14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+    scale: 1.08;
+  }
+}
+.paper-icon-button-light:active, .headerButton:active { scale: .92; }
+
+.navMenuOptionIcon { transition: scale .35s var(--lg-spring), color .3s var(--lg-ease), filter .3s var(--lg-ease); }
+.navMenuOption:hover .navMenuOptionIcon { scale: 1.12; }
+.navMenuOption-selected .navMenuOptionIcon,
+.emby-tab-button-active .material-icons {
+  color: var(--lg-accent);
+  filter: drop-shadow(0 0 8px var(--lg-glow));
+}
+
+
+/* --------------------------------------------------------------------------
+   5. BUTTONS
+   -------------------------------------------------------------------------- */
+.emby-button {
+  border-radius: var(--lg-radius-sm);
+  transition: background-color .3s var(--lg-ease), box-shadow .3s var(--lg-ease), scale .3s var(--lg-spring), color .3s var(--lg-ease);
+}
+.emby-button:active { scale: .97; }
+
+.emby-button.raised:not(.button-submit),
+.emby-button.button-flat:hover {
+  background: var(--lg-fill-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32), 0 6px 18px rgba(0, 0, 0, .28);
+  color: var(--lg-text);
+}
+.emby-button.button-submit,
+.emby-button.raised.button-submit {
+  background: linear-gradient(135deg, var(--lg-accent), var(--lg-accent-2)) !important;
+  color: #0a0e18 !important;
+  font-weight: 600;
+  box-shadow: 0 8px 24px var(--lg-glow), inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+@media (hover: hover) and (pointer: fine) {
+  .emby-button.raised:hover, .emby-button.button-submit:hover { scale: 1.03; }
+}
+
+
+/* --------------------------------------------------------------------------
+   6. NAVIGATION — tabs, drawer, scrollers, A–Z picker, focus
+   -------------------------------------------------------------------------- */
+/* Tabs become pills */
+.emby-tab-button {
+  min-height: 2.75rem;
+  margin: 0 .15rem;
+  padding: .55em 1.1em;
+  border-radius: 999px !important;
+  border-bottom: 0 !important;
+  color: var(--lg-text-dim);
+  transition: background-color .3s var(--lg-ease), color .3s var(--lg-ease), box-shadow .3s var(--lg-ease);
+}
+.emby-tab-button:hover { color: var(--lg-text); background: rgba(255, 255, 255, .08); }
+.emby-tab-button-active,
+.emby-tab-button-active:hover {
+  color: #fff !important;
+  background: var(--lg-fill-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .36), 0 4px 16px rgba(0, 0, 0, .28);
+}
+
+/* Drawer items */
+.navMenuOption {
+  border-radius: var(--lg-radius-sm);
+  transition: background-color .3s var(--lg-ease), translate .35s var(--lg-ease), color .3s var(--lg-ease);
+}
+.navMenuOption:hover { background: rgba(255, 255, 255, .09); translate: 3px 0; }
+.navMenuOption-selected, .navMenuOption-selected:hover {
+  background: var(--lg-fill-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 0 0 1px rgba(255, 255, 255, .1);
+  color: #fff !important;
+}
+
+/* Horizontal shelves: gentle snap, glass scroll arrows, room for hover lift */
+.emby-scroller { scroll-snap-type: x proximity; scroll-padding-inline: 4%; overscroll-behavior-x: contain; }
+.itemsContainer.scrollSlider > .card { scroll-snap-align: start; }
+.itemsContainer.scrollSlider { padding-block: 10px; margin-block: -10px; }
+
+.emby-scrollbuttons .paper-icon-button-light {
+  background: var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+  box-shadow: var(--lg-shadow);
+  border: 1px solid var(--lg-rim);
+}
+
+/* A–Z jump bar */
+.alphaPickerButton { border-radius: 8px; transition: background-color .25s var(--lg-ease), color .25s var(--lg-ease), scale .3s var(--lg-spring); }
+.alphaPickerButton:hover, .alphaPickerButton-selected { background: var(--lg-fill-strong); color: #fff; scale: 1.15; }
+
+/* Visible keyboard / remote focus everywhere */
+.emby-button:focus-visible,
+.emby-tab-button:focus-visible,
+.navMenuOption:focus-visible,
+.listItem:focus-visible,
+.alphaPickerButton:focus-visible,
+.paper-icon-button-light:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--lg-glow);
+}
+.cardImageContainer:focus-visible,
+.cardContent:focus-visible { outline: 3px solid var(--lg-accent); outline-offset: -3px; }
+
+
+/* --------------------------------------------------------------------------
+   7. MEDIA CARDS — posters, hover lift, play button, progress
+   -------------------------------------------------------------------------- */
+.cardScalable, .cardContent, .cardImageContainer, .cardOverlayContainer { border-radius: var(--lg-radius); }
+.cardScalable {
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .38);
+  transition: box-shadow .5s var(--lg-ease);
+}
+/* Glass rim around each poster */
+.cardScalable::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
+.cardBox { position: relative; transition: translate .5s var(--lg-ease), scale .5s var(--lg-ease); }
+.cardText { color: var(--lg-text); }
+.cardText-secondary { color: var(--lg-text-dim); }
+
+.cardOverlayContainer {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .05), rgba(0, 0, 0, .58)) !important;
+  transition: opacity .35s var(--lg-ease);
+}
+.cardOverlayFab-primary { transition: scale .35s var(--lg-spring), background-color .3s var(--lg-ease); }
+
+/* Hover effects only on devices that can actually hover (keeps phones snappy) */
+@media (hover: hover) and (pointer: fine) {
+  .cardBox:hover { translate: 0 -6px; scale: 1.035; z-index: 3; }
+  .cardBox:hover .cardScalable { box-shadow: 0 20px 44px rgba(0, 0, 0, .55), 0 0 30px var(--lg-glow); }
+  .cardBox:hover .cardOverlayFab-primary {
+    background: rgba(255, 255, 255, .22) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+    backdrop-filter: blur(14px) saturate(170%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 8px 24px rgba(0, 0, 0, .4);
+  }
+  .cardOverlayFab-primary:hover { scale: 1.14; }
+}
+
+/* Progress + badges */
+.itemProgressBar { height: 4px; border-radius: 99px; background: rgba(255, 255, 255, .22); overflow: hidden; }
+.itemProgressBarForeground {
+  background: linear-gradient(90deg, var(--lg-accent), var(--lg-accent-2)) !important;
+  border-radius: 99px;
+  transition: width .7s var(--lg-ease);
+}
+.playedIndicator, .countIndicator {
+  background: linear-gradient(135deg, var(--lg-accent), var(--lg-accent-2)) !important;
+  color: #0a0e18 !important;
+  font-weight: 700;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+.sectionTitle, .sectionTitle-cards { font-weight: 650; letter-spacing: -.01em; }
+
+
+/* --------------------------------------------------------------------------
+   8. DETAIL PAGE + EPISODE LISTS
+   -------------------------------------------------------------------------- */
+.mediaInfoItem {
+  display: inline-flex; align-items: center;
+  padding: .15em .7em;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 999px;
+}
+
+.detailButton { border-radius: 999px; }
+
+.listItem { border-radius: var(--lg-radius-sm); transition: background-color .3s var(--lg-ease); }
+@media (hover: hover) and (pointer: fine) { .listItem:hover { background: rgba(255, 255, 255, .08); } }
+
+/* Frosted panel over the backdrop on large screens (delete this block if it looks off on your version) */
+@media (min-width: 62em) {
+  .detailPagePrimaryContainer {
+    margin: 1rem 2%;
+    padding-block: 1rem;
+    background: var(--lg-fill);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    border: 1px solid var(--lg-rim);
+    border-radius: 28px;
+    box-shadow: var(--lg-shadow);
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   9. MOTION — one orchestrated moment: library grids cascade in
+   -------------------------------------------------------------------------- */
+@keyframes lg-rise {
+  from { opacity: 0; translate: 0 16px; scale: .97; }
+}
+.itemsContainer.vertical-wrap > .card { animation: lg-rise .6s var(--lg-ease) backwards; }
+.itemsContainer.vertical-wrap > .card:nth-child(2)  { animation-delay: .04s; }
+.itemsContainer.vertical-wrap > .card:nth-child(3)  { animation-delay: .08s; }
+.itemsContainer.vertical-wrap > .card:nth-child(4)  { animation-delay: .12s; }
+.itemsContainer.vertical-wrap > .card:nth-child(5)  { animation-delay: .16s; }
+.itemsContainer.vertical-wrap > .card:nth-child(6)  { animation-delay: .20s; }
+.itemsContainer.vertical-wrap > .card:nth-child(7)  { animation-delay: .24s; }
+.itemsContainer.vertical-wrap > .card:nth-child(8)  { animation-delay: .28s; }
+.itemsContainer.vertical-wrap > .card:nth-child(9)  { animation-delay: .32s; }
+.itemsContainer.vertical-wrap > .card:nth-child(10) { animation-delay: .36s; }
+.itemsContainer.vertical-wrap > .card:nth-child(n+11) { animation-delay: .4s; }
+
+
+/* --------------------------------------------------------------------------
+   10. CROSS-DEVICE
+   -------------------------------------------------------------------------- */
+/* Phones & tablets: bigger targets, slightly tighter corners, notch-safe header */
+@media (pointer: coarse) {
+  .paper-icon-button-light, .headerButton { min-width: 44px; min-height: 44px; }
+  .navMenuOption { padding-block: .95em; }
+  .alphaPickerButton { min-height: 32px; }
+}
+@media (max-width: 50em) {
+  :root { --lg-radius: 14px; }
+  .skinHeader { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .emby-tab-button { padding: .5em .95em; }
+}
+
+/* TV layout: lighter blur for weaker GPUs, big unmistakable focus, no entrance motion */
+.layout-tv { --lg-blur: 12px; }
+.layout-tv .itemsContainer.vertical-wrap > .card { animation: none; }
+.layout-tv .cardBox:focus-within { translate: 0 -6px; scale: 1.06; z-index: 3; }
+.layout-tv .cardBox:focus-within .cardScalable { box-shadow: 0 0 0 4px var(--lg-accent), 0 20px 44px rgba(0, 0, 0, .55), 0 0 36px var(--lg-glow); }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
